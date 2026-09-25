@@ -1,0 +1,9 @@
+{"raw_resort": "marriott aruba surf club", "matched_resort": "Marriott's Aruba Surf Club", "score": 0.96, "event": "fuzzy_resort_match", "level": "info", "logger": "fuzzy_match", "timestamp": "2026-04-14T09:43:15.076989Z"}
+{"raw_unit": "1 Bedroom Villa, Ocean view", "matched_unit": "1 Bedroom Ocean View", "score": 1.0, "event": "fuzzy_unit_match", "level": "info", "logger": "fuzzy_match", "timestamp": "2026-04-14T09:43:15.076989Z"}
+{"raw_resort": "marriott aruba surf club", "matched_resort": "Marriott's Aruba Surf Club", "score": 0.96, "event": "fuzzy_resort_match", "level": "info", "logger": "fuzzy_match", "timestamp": "2026-04-14T09:43:21.412058Z"}
+{"raw_unit": "1 Bedroom Villa, Ocean view", "matched_unit": "1 Bedroom Ocean View", "score": 1.0, "event": "fuzzy_unit_match", "level": "info", "logger": "fuzzy_match", "timestamp": "2026-04-14T09:43:21.412058Z"}
+{"raw_unit": "1 Bedroom Plus (1DP", "matched_unit": "1 Bedroom (1BR)", "score": 1.0, "event": "fuzzy_unit_match", "level": "info", "logger": "fuzzy_match", "timestamp": "2026-04-14T10:06:48.354215Z"}
+{"raw_unit": "1 Bedroom Plus (1DP", "matched_unit": "1 Bedroom (1BR)", "score": 1.0, "event": "fuzzy_unit_match", "level": "info", "logger": "fuzzy_match", "timestamp": "2026-04-14T10:06:53.707829Z"}
+{"raw_resort": "marriott s aruba surf club", "matched_resort": "Marriott's Aruba Surf Club", "score": 0.9615, "event": "fuzzy_resort_match", "level": "info", "logger": "fuzzy_match", "timestamp": "2026-04-20T14:16:29.008612Z"}
+{"raw_resort": "marriott s aruba surf club", "matched_resort": "Marriott's Aruba Surf Club", "score": 0.9615, "event": "fuzzy_resort_match", "level": "info", "logger": "fuzzy_match", "timestamp": "2026-04-20T14:16:34.027542Z"}
+{"raw_unit": "1 Bedroom Villa", "matched_unit": "1 bedroom deluxe", "score": 0.75, "event": "fuzzy_unit_match", "level": "info", "logger": "fuzzy_match", "timestamp": "2026-09-25T10:04:41.512577Z"}
