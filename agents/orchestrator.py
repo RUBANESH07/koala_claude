@@ -133,14 +133,6 @@ def _run_quick(
     )
     resolution = resolve(resort_name, unit_name)
 
-    # Taxonomy matching is advisory only — fall back to the raw resort/unit
-    # names so pricing can still proceed when there's no taxonomy entry.
-    if resolution["resort_confidence"] == "no_match":
-        resolution = {**resolution, "display_resort_name": resort_name}
-
-    if resolution["unit_confidence"] == "no_match":
-        resolution = {**resolution, "display_unit_name": unit_name}
-
     result = quick_price(resolution, ci_dt.date(), co_dt.date(), nights)
 
     if result is None:

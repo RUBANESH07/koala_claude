@@ -1,11 +1,11 @@
 import requests
 import json
 
-URL = "http://18.189.220.6:5000/api/price"
+URL = "http://127.0.0.1:5000/api/price"
 
 payload = {
-    "resort_name": "Marriott's Grand Chateau",
-    "unit_name": "1 Bedroom Villa",
+    "resort_name": "Club Wyndham Bonnet Creek",
+    "unit_name": "2 Bedroom Deluxe",
     "check_in": "12/21/2026",
     "check_out": "12/28/2026"
 }
