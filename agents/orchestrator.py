@@ -87,15 +87,19 @@ def run(
     unit_name: str,
     checkin_date: str,
     checkout_date: str,
+    comparable_units: list[dict] | None = None,
 ) -> str:
     """
     Execute the pricing pipeline for one query (quick-price based).
 
     Args:
-        resort_name:    Raw resort name from user
-        unit_name:      Raw unit name from user
-        checkin_date:   MM/DD/YYYY
-        checkout_date:  MM/DD/YYYY
+        resort_name:      Raw resort name from user
+        unit_name:        Raw unit name from user
+        checkin_date:     MM/DD/YYYY
+        checkout_date:    MM/DD/YYYY
+        comparable_units: Optional sibling unit types at the same resort, each
+                           {"id": int, "name": str, "average_listing_price": float|None},
+                           used to anchor the estimate so tiers stay logically ordered.
 
     Returns:
         Formatted pricing string (success or graceful failure).
@@ -110,7 +114,7 @@ def run(
         checkin=checkin_date,
         checkout=checkout_date,
     )
-    return _run_quick(resort_name, unit_name, checkin_date, checkout_date)
+    return _run_quick(resort_name, unit_name, checkin_date, checkout_date, comparable_units)
 
 
 # ---------------------------------------------------------------------------
@@ -122,6 +126,7 @@ def _run_quick(
     unit_name: str,
     checkin_date: str,
     checkout_date: str,
+    comparable_units: list[dict] | None = None,
 ) -> str:
     """
     Fast pricing path: single Sonnet call using model knowledge (~3–5s).
@@ -133,7 +138,7 @@ def _run_quick(
     )
     resolution = resolve(resort_name, unit_name)
 
-    result = quick_price(resolution, ci_dt.date(), co_dt.date(), nights)
+    result = quick_price(resolution, ci_dt.date(), co_dt.date(), nights, comparable_units)
 
     if result is None:
         return format_failure(
@@ -186,9 +191,14 @@ def run_cached(
     unit_name: str,
     checkin_date: str,
     checkout_date: str,
+    comparable_units: list[dict] | None = None,
 ) -> str:
     """
     Customer-facing entry point. Always returns quickly.
+
+    Args:
+        comparable_units: Optional sibling unit types at the same resort, each
+                           {"id": int, "name": str, "average_listing_price": float|None}.
 
     Flow:
       1. Cache hit with both results → return combined quick + full view
@@ -209,14 +219,14 @@ def run_cached(
 
     # Step 2 — quick estimate
     log.info("run_cached_quick_start", resort=resort_name, unit=unit_name)
-    result = _run_quick(resort_name, unit_name, checkin_date, checkout_date)
+    result = _run_quick(resort_name, unit_name, checkin_date, checkout_date, comparable_units)
     cache.put(resort_name, unit_name, checkin_date, checkout_date, result, mode="quick")
 
     # Step 3 — background full pipeline
     def _background() -> None:
         log.info("background_pipeline_start", resort=resort_name, unit=unit_name)
         try:
-            full_result = run(resort_name, unit_name, checkin_date, checkout_date)
+            full_result = run(resort_name, unit_name, checkin_date, checkout_date, comparable_units)
             cache.put(resort_name, unit_name, checkin_date, checkout_date,
                       full_result, mode="full")
             log.info("background_pipeline_done", resort=resort_name)

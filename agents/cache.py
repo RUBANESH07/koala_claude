@@ -103,3 +103,27 @@ def put(
         data[key] = entry
         _save(data)
     log.info("cache_write", key=key, mode=mode)
+
+
+def save_payload(
+    resort: str,
+    unit: str,
+    checkin: str,
+    checkout: str,
+    payload: dict,
+) -> None:
+    """Store the raw incoming request payload alongside the cached entry."""
+    key = _make_key(resort, unit, checkin, checkout)
+    now = datetime.now()
+    with _lock:
+        data = _load()
+        entry = data.get(key, {
+            "cached_at": now.isoformat(),
+            "expires_at": (now + timedelta(hours=TTL_HOURS)).isoformat(),
+            "quick_result": None,
+            "full_result": None,
+        })
+        entry["payload"] = payload
+        data[key] = entry
+        _save(data)
+    log.info("cache_write_payload", key=key)

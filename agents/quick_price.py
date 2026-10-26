@@ -42,14 +42,55 @@ _RESULT_SCHEMA = (
 )
 
 
+def _format_comparable_units(unit_name: str, comparable_units: Optional[list[dict]]) -> str:
+    """
+    Build a prompt section anchoring the estimate to known average prices for
+    sibling unit types at the same resort, so tiers stay logically ordered
+    (e.g. a plain "3 Bedroom" should not price above "3 Bedroom Deluxe").
+
+    Each entry's `average_listing_price` may be null (no data yet) or a number —
+    both are accepted; null entries are listed as "no data" rather than skipped,
+    so the model still knows that tier exists.
+    """
+    if not comparable_units:
+        return ""
+
+    lines = []
+    for u in comparable_units:
+        name = (u.get("name") or "").strip()
+        if not name or name.lower() == unit_name.lower():
+            continue
+        avg = u.get("average_listing_price")
+        price_str = f"${avg:,.2f}/night avg" if isinstance(avg, (int, float)) else "no data"
+        lines.append(f"  - {name}: {price_str}")
+
+    if not lines:
+        return ""
+
+    return (
+        "\n\nOther unit types at this same resort and their known average listing "
+        "prices (use these as anchors — your estimate MUST stay logically consistent "
+        "with them: higher-tier names like 'Deluxe', 'Presidential', or 'Suite' should "
+        "price at or above comparable plain/standard units of the same bedroom count, "
+        "and larger bedroom counts should generally price above smaller ones):\n"
+        + "\n".join(lines)
+    )
+
+
 def quick_price(
     resolution: dict,
     checkin: date,
     checkout: date,
     nights: int,
+    comparable_units: Optional[list[dict]] = None,
 ) -> Optional[dict]:
     """
     Single Haiku call (no web_search) for a fast knowledge-based price estimate.
+
+    Args:
+        comparable_units: Optional list of sibling unit types at the same resort,
+            each like {"id": int, "name": str, "average_listing_price": float|None}.
+            Used to anchor the estimate so tiers stay logically ordered.
 
     Returns a platform result dict compatible with validation.validate() and
     pricing.price(), or None if the estimate fails.
@@ -127,7 +168,8 @@ def quick_price(
         f"in the same destination, unit size, view type, and season.\n\n"
         f"Provide a realistic price_low and price_high range reflecting actual "
         f"secondary market rental prices. Set price_per_night to the midpoint. "
-        f"Always return found=true with an estimate.\n\n"
+        f"Always return found=true with an estimate."
+        f"{_format_comparable_units(unit, comparable_units)}\n\n"
         f"Return this JSON only:\n{_RESULT_SCHEMA}"
     )
 
